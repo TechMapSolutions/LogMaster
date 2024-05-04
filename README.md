@@ -23,3 +23,11 @@ LogMaster is a versatile tool that allows you to effectively manage your log rec
 
 Try LogMaster and share your feedback with us. We're constantly improving, and user feedback is invaluable to us.
 
+# Get Started
+
+LogMaster operates via command-line parameters within the terminal.
+
+`pip3 install -r requirements.txt`
+
+`python LogMaster.py --help`
+
