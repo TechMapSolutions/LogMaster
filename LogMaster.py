@@ -4,7 +4,7 @@ from termcolor import colored
 from datetime import datetime, timedelta
 import time
 import glob
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import ctypes
 import chardet
 import os
@@ -157,65 +157,22 @@ def sort_logs_by_size():
 
 
 def search_logs(search_word):
-
-   if os_name == 'Windows':
-      log_files = glob.glob('C:\\Windows\\System32\\winevt\\Logs\\*')
-      file_count = 0  # Bulunan dosyaları saymak için yeni bir değişken
-      for log_file in log_files:
-         word_found = False
-         try:
-            with open(log_file, 'r') as file:
-               for line_number, line in enumerate(file, start=1):
-                  if search_word in line:
-                     print(
-                        f'Aranan Kelime Bulundu: "{search_word}" Dosya ismi:{log_file} Satır numarası: {line_number}: {line.strip()}')
-                     word_found = True
-                     break  # Kelimeyi bulduktan sonra döngüyü kır
-         except IOError:
-            print(f"Hata: {log_file} açılamadı.")
-            continue
-         if word_found:
-            file_count += 1  # Kelimeyi içeren her dosya için sayacı artırın
-         else:
-            print("Aranan kelime bu dosyada bulunamadı: " + log_file)
-      print(f"Aranan kelime {file_count} dosyada bulundu.")  # Toplam dosya sayısını yazdırın
-
-   elif os_name == 'Linux':
-      print("arıyorum")
-      folder_path = '/var/log/'
-      log_files = glob.glob(os.path.join(folder_path, '**/**/*.log*'), recursive=True)
-
-      file_count = 0  # Bulunan dosyaları saymak için yeni bir değişken
-
-      for log_file in log_files:
-         word_found = False
-         try:
-            with open(log_file, 'rb') as file:
-               for line_number, line in enumerate(file, start=1):
-                  try:
-                     line = line.decode('utf-8')
-                  except UnicodeDecodeError:
-                     encoding = detect_file_encoding(log_file)
-                     if encoding is not None:
-                        line = line.decode(encoding)
-                     else:
-                        continue
-                  if search_word in line:
-                     print(colored(
-                        f'Aranan Kelime Bulundu: "{search_word}" Dosya ismi:{log_file} Satır numarası: {line_number}: {line.strip()}',
-                        'green'))
-                     word_found = True
-                     break  # Kelimeyi bulduktan sonra döngüyü kır
-         except IOError:
-            print(f"Hata: {log_file} açılamadı.")
-            continue
-         if word_found:
-            file_count += 1  # Kelimeyi içeren her dosya için sayacı artırın
-         else:
-            print(colored("Aranan kelime bu dosyada bulunamadı: ", 'red') + log_file)
-      print(f"Aranan kelime {file_count} dosyada bulundu.")  # Toplam dosya sayısını yazdırın
-
-
+   file_count = 0  # Aranan kelimenin bulunduğu dosya sayısını tutacak sayaç
+   for log_file in log_files:
+      word_found = False
+      encoding = detect_file_encoding(log_file)
+      with open(log_file, 'r', encoding=encoding, errors='ignore') as file:
+         for line_number, line in enumerate(file, start=1):
+            if search_word in line:
+               print(colored(
+                  f'Aranan Kelime Bulundu: "{search_word}" Dosya ismi:{log_file} Satır numarası: {line_number}: {line.strip()}',
+                  'green'))
+               word_found = True
+      if word_found:
+         file_count += 1  # Eğer kelime bu dosyada bulunduysa, sayacı artır
+      else:
+         print(colored("Aranan kelime bu dosyada bulunamadı: ", 'red') + log_file)
+   print(f"\nAranan kelime {file_count} dosyada bulundu.")  # Toplam dosya sayısını yazdır
 def clear_windows_logs():
    # Windows Event Log'ları listele
    logs = subprocess.run(["wevtutil", "el"], capture_output=True, text=True).stdout.splitlines()
@@ -259,7 +216,6 @@ def is_admin():
       return ctypes.windll.shell32.IsUserAnAdmin()
    except:
       return False
-
 
 hostname = socket.gethostname()
 os_name = platform.system()
