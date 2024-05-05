@@ -4,17 +4,36 @@ from termcolor import colored
 from datetime import datetime, timedelta
 import time
 import glob
-import ctypes
 import matplotlib.pyplot as plt
+import ctypes
 import chardet
 import os
 import getpass
 import argparse
 import subprocess
 import logging
+print(""""
+██       ██████   ██████  ███    ███  █████  ███████ ████████ ███████ ██████  
+██      ██    ██ ██       ████  ████ ██   ██ ██         ██    ██      ██   ██ 
+██      ██    ██ ██   ███ ██ ████ ██ ███████ ███████    ██    █████   ██████  
+██      ██    ██ ██    ██ ██  ██  ██ ██   ██      ██    ██    ██      ██   ██ 
+███████  ██████   ██████  ██      ██ ██   ██ ███████    ██    ███████ ██   ██ 
+""")
+time.sleep(0.3)
 
-euid = os.getpid() # User ID almak için
-logging.basicConfig(level=logging.ERROR) # konfrigürasyon
+
+
+if os.name == 'nt':
+   euid = ctypes.windll.shell32.IsUserAnAdmin()
+else:
+   euid = os.geteuid()
+
+
+
+
+
+
+
 username = getpass.getuser()
 parser = argparse.ArgumentParser(description='Log yönetim aracı.')
 parser.add_argument('-c', '--clear', action='store_true', help='Logları temizle')
@@ -80,7 +99,6 @@ def age_graphic():
 def classify_logs_by_error_messages():
     log_files = glob.glob('/var/log/**/*.log*', recursive=True)
 
-    # Sınıflandırma kriterlerimiz
     categories = {
         "error": [],
         "warning": [],
@@ -162,7 +180,10 @@ def search_logs(search_word):
             print("Aranan kelime bu dosyada bulunamadı: " + log_file)
       print(f"Aranan kelime {file_count} dosyada bulundu.")  # Toplam dosya sayısını yazdırın
 
-   if os_name == 'Linux':
+   elif os_name == 'Linux':
+      print("arıyorum")
+      folder_path = '/var/log/'
+      log_files = glob.glob(os.path.join(folder_path, '**/**/*.log*'), recursive=True)
 
       file_count = 0  # Bulunan dosyaları saymak için yeni bir değişken
 
@@ -247,7 +268,7 @@ time.sleep(0.8)
 print("Kullanıcı adı:" +colored('{}', 'red').format(username))
 time.sleep(0.8)
 if euid == 0 or is_admin():
-   logging.info(colored("Sudo yetkisi alındı",'blue'))
+   print((colored("Sudo yetkisi alındı",'blue')))
    time.sleep(1)
 
    if args.search:
